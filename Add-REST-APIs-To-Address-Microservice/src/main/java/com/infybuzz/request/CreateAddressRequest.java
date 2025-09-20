@@ -1,5 +1,6 @@
 package com.infybuzz.request;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -8,6 +9,7 @@ import javax.validation.constraints.Size;
 public class CreateAddressRequest {
 
 	private long addressId;
+	@NotBlank
 	@NotNull(message="Street name size can't be Null")
 	@NotEmpty(message="Street name size can't be Empty")
 	@Size(max = 100, min = 5, message="Street name size can't be leaa than 5 and grater than 100")

@@ -28,8 +28,7 @@ public class AddressController {
 	AddressService addressService;
 
 	@PostMapping("/create")
-	public ResponseEntity<AddressResponse> createAddress (@Valid @RequestBody CreateAddressRequest createAddressRequest) {
-		
+	public ResponseEntity<AddressResponse> createAddress (@Valid @RequestBody CreateAddressRequest createAddressRequest) {		
 		return new ResponseEntity<AddressResponse>(addressService.createAddress(createAddressRequest), HttpStatus.OK);
 	}
 	
@@ -38,7 +37,7 @@ public class AddressController {
 		return addressService.updateAddress(createAddressRequest);
 	}	
 	
-	@GetMapping(value = "/getById/{id}", produces = MediaType.APPLICATION_XML_VALUE)
+	@GetMapping(value = "/getById/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public AddressResponse getById(@PathVariable long id) {
 		return addressService.getById(id);
 	}
@@ -47,5 +46,12 @@ public class AddressController {
 	public AddressResponse deleteById(@RequestParam(value="id", required = false) long id) {
 		return addressService.deleteAddressById(id);
 	}
+	
+	@GetMapping(value = "/getByNo")
+	public AddressResponse getByNo(@RequestParam(value="id", required = false) long id) {
+		return addressService.getById(id);
+	}
+	
+	
 	
 }

@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
 
+import com.infybuzz.app.AddressJdbcRepository;
 import com.infybuzz.entity.Address;
-import com.infybuzz.entity.Person;
 import com.infybuzz.repository.AddressRepository;
 import com.infybuzz.request.CreateAddressRequest;
 import com.infybuzz.request.Status;
@@ -33,7 +36,17 @@ public class AddressService {
 	CacheManager cacheManager;	
 	
 	@Autowired
-	AddressRepository addressRepository;
+	AddressRepository addressRepository;	
+	
+	/*
+	 * @Autowired AddressJdbcRepository jdbcRepository;
+	 */
+	
+	JdbcTemplate jddbcTemplate;
+	@Autowired
+	public AddressService(DataSource datasource) {
+		this.jddbcTemplate = new JdbcTemplate(datasource);
+	}
 	
 	String name;
 	
@@ -82,10 +95,31 @@ public class AddressService {
 		logger.info("Inside getById " + id);
 		
 		logger.info("Name : " + name);
+		//Address address = addressRepository.findById(id).get();
 		Address address = addressRepository.findById(id).get();
-		
+				//getByIdJdbcTemplate(id);
 		return new AddressResponse(address, new Status("SUCCESS", "Address retrieved successfully"));
 	}
+   
+    public Address getByIdJdbcTemplate(long id) {
+	   
+		String sql = "SELECT * FROM Address WHERE id = ?";
+		Address address = this.jddbcTemplate.queryForObject(sql, new Object[]{id}, userRowMapper);
+		//this.jdbcTemplate.execute(sql); DDL statement (example insert)
+		//this.jdbcTemplate.update(sql, null)
+		return address;
+	}   
+	   
+	   
+  private RowMapper<Address> userRowMapper = (rs, rowNum) -> {
+	   Address user = new Address();
+      user.setId(rs.getLong("id"));
+      user.setCity(rs.getString("city"));
+      user.setStreet(rs.getString("street"));
+      return user;
+  };
+   
+    
    
   // @Scheduled(fixedRate = 60000)
    public void scheduledFixedRate() throws InterruptedException {
